@@ -1,5 +1,5 @@
 #include "points.h"
-#include "splines.h"
+#include "splines_t.h"
 #include "makespl.h"
 
 #include <getopt.h>

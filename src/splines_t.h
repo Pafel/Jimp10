@@ -2,11 +2,14 @@
 #define SPLINES_H
 
 #include <stdio.h>
+#include <math.h>
 
 typedef struct {
 		int n;
 		double *x;
-		double *f;
+		double *y;
+		double *a;
+		double *b;
 } spline_t;
 
 int alloc_spl( spline_t *spl, int n );

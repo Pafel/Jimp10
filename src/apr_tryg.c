@@ -1,54 +1,44 @@
-#include <math.h>
-#include <stdlib.h>
-
-#include "points.h"
 #include "splines_t.h"
+#include "points.h"
+
+#include <stdio.h>
+#include <math.h>
 
 #define PI 3.14
 
-int factor (int m , double *a , double *b, points_t p);
-
-double mainfactor (points_t p);
-
-double make_spl (points_t p , spline_t spl)
+void make_spl (points_t * pts, spline_t * spl)
 {
-	int m = (p.n-1)/2 - 1;
+	int i, j, m;
+	int n = pts->n;
+	int nd = (double)n;
+	if (n % 2 == 1)
+		m = (n-1)/2-1;
+	else 
+		m = n/2-1;
 
-	double ao = mainfactor ( p );
-	double a[m];
-	double b[m];
+	if (alloc_spl(spl, pts->n) == 0) {
+		spl->x = pts->x;
+		spl->y = pts->y;
+	
+		spl->a[0] = 0.0;
+		spl->b[0] = 0.0;
 
-	int i;
+		for (i = 1 ; i < n ; i++)
+			spl->a[0] += spl->y[i];
 
-	for (i = 0 ; i < p.n ; i++)
-		spl.x[i] = p.x[i];
-}
+		spl->a[0] /= nd;
+		
+		for (i=1 ; i <= m ; i++) {
+			spl->a[i] = 0.0;
+			spl->b[i] = 0.0;
 
-int factor (int m , double *a ,double *b, points_t p)
-{
-	int i, j;
+			for(j = 1; j < n ; j++) {
+				spl->a[i] += spl->y[j]*cos(2*PI*i*j/nd);
+				spl->b[i] += spl->y[j]*sin(2*PI*i*j/nd);
+			}
 
-	for (i = 0 ; i < m ; i++) {
-		for (j = 0 ; j < m ; j++) {
-			a[i] += p.y[j] * sin((2*PI*i*j)/p.n);
-			b[i] += p.y[i] * cos((2*PI*i*j)/p.n);
+		spl->a[i] *= 2.0/nd;
+		spl->b[i] *= 2.0/nd;
 		}
-	a[i] *= 2/p.n;
-	b[i] *= 2/p.n;
 	}
-return 0;
-}
-
-double mainfactor (points_t p)
-{
-	int i;
-	double ao = 0;
-
-	for (i = 0 ; i < p.n ; i++) {
-		double ao = ao + p.y[i];
-	}
-
-	ao /= p.n;
-
-	return ao;
 }

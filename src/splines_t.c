@@ -48,15 +48,23 @@ value_spl (spline_t * spl, double x)
   int i, m;
   int n = spl->n;
   double nd = (double)n;
-  double y = spl->a[0];
+  double y = spl->a[0]/2;
 
-  if (n % 2 == 1)
-	m = (n-1)/2 - 1;
-  else
-	m = n/2 - 1; 
+	if (n % 2 == 1) {
+		m = (n-1)/2;
 
-  for (i = 1; i <= m ; i++)
-	y += spl->a[i]*cos(2.0*M_PI*i/nd)*x + spl->b[i]*sin(2.0*M_PI*i/nd)*x;
+		for (i = 1; i <= m ; i++)
+			y += spl->a[i]*cos(i*x) + spl->b[i]*sin(i*x);
+	}
 
-  return y;
+	else {
+		m = n/2;
+
+		for (i = 1; i < m ; i++)
+			y += spl->a[i]*cos(2*M_PI*i*x/nd) + spl->b[i]*sin(2*M_PI*i*x/nd);
+
+		y += (spl->a[m]/2)*cos(m*x);
+	}
+
+	return y;
 }

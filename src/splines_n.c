@@ -1,4 +1,4 @@
-#include "splines_t.h"
+#include "splines_n.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -6,7 +6,7 @@
 #define MALLOC_FAILED( P, SIZE ) (((P)=malloc( (SIZE)*sizeof( *(P))))==NULL)
 
 int
-alloc_spl (spline_t * spl, int n)
+alloc_spl_tan (spline_t * spl, int n)
 {
   spl->n = n;
   return MALLOC_FAILED (spl->x, spl->n)
@@ -16,7 +16,7 @@ alloc_spl (spline_t * spl, int n)
 }
 
 int
-read_spl (FILE * inf, spline_t * spl)
+read_spl_tan (FILE * inf, spline_t * spl)
 {
   int i;
   if (fscanf (inf, "%d", &(spl->n)) != 1 || spl->n < 0)
@@ -34,7 +34,7 @@ read_spl (FILE * inf, spline_t * spl)
 }
 
 void
-write_spl (spline_t * spl, FILE * ouf)
+write_spl_tan (spline_t * spl, FILE * ouf)
 {
   int i;
   fprintf (ouf, "%d\n", spl->n);
@@ -43,27 +43,35 @@ write_spl (spline_t * spl, FILE * ouf)
 }
 
 double
-value_spl (spline_t * spl, double x)
+value_spl_tan (spline_t * spl, double x)
 {
   int i, m;
   int n = spl->n;
   double nd = (double)n;
   double y = spl->a[0]/2;
+  double p = 2*M_PI/n;
+  char *nbEnv= getenv( "APPROX_BASE_SIZE" );
 
 	if (n % 2 == 1) {
 		m = (n-1)/2;
 
+	if( nbEnv != NULL && atoi( nbEnv ) > 0 && atoi( nbEnv ) <= m)
+		m = atoi( nbEnv );
+
 		for (i = 1; i <= m ; i++)
-			y += spl->a[i]*cos((4.0/nd)*i*x) + spl->b[i]*sin((4.0/nd)*i*x);
+			y += spl->a[i]*cos(p*i*x) + spl->b[i]*sin(p*i*x);
 	}
 
 	else {
 		m = n/2;
 
-		for (i = 1; i < m ; i++)
-			y += spl->a[i]*cos((4.0/nd)*i*x) + spl->b[i]*sin((4.0/nd)*i*x);
+	if( nbEnv != NULL && atoi( nbEnv ) > 0 && atoi( nbEnv ) <= m)
+		m = atoi( nbEnv );
 
-		y += (spl->a[m]/2)*cos((4.0/nd)*m*x);
+		for (i = 1; i < m ; i++)
+			y += spl->a[i]*cos(p*i*x) + spl->b[i]*sin(p*i*x);
+
+		y += spl->a[m]/2*cos(p*m*x);
 	}
 
 	return y;

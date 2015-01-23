@@ -1,10 +1,13 @@
 #include "points.h"
-#include "splines_t.h"
+#include "splines.h"
+#include "splines_n.h"
 #include "makespl.h"
 
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define APPROX_BASE_SIZE
 
 char *usage =
   "Usage: %s -s spline-file [-p points-file] [ -g gnuplot-file [-f from_x -t to_x -n n_points ] ]\n"
@@ -34,6 +37,7 @@ main (int argc, char **argv)
 	double toX = 0;
 	int n = 100;
 	char *progname= argv[0];
+	int mode = 0;
 
 	points_t pts;
 	spline_t spl;
@@ -42,7 +46,7 @@ main (int argc, char **argv)
 	spl.n = 0;
 
 	/* process options, save user choices */
-	while ((opt = getopt (argc, argv, "p:s:g:f:t:n:")) != -1) {
+	while ((opt = getopt (argc, argv, "p:s:g:f:t:n:m:")) != -1) {
 		switch (opt) {
 			case 'p':
 				inp = optarg;
@@ -61,6 +65,9 @@ main (int argc, char **argv)
 				break;
 			case 'n':
 				n = atoi (optarg);
+				break;
+			case 'm':
+				mode = atoi (optarg);
 				break;
 			default:                   /* '?' */
 				fprintf (stderr, usage, progname);
@@ -99,11 +106,16 @@ main (int argc, char **argv)
       fprintf (stderr, "%s: can not write spline file: %s\n\n", argv[0], out);
       exit (EXIT_FAILURE);
     }
-
+	if (mode == 0)
     make_spl (&pts, &spl);
+	else
+		make_tryg (&pts, &spl);
 
     if( spl.n > 0 )
+	if (mode == 0)
 			write_spl (&spl, ouf);
+	else if (mode == 1)
+			write_spl_tan (&spl, ouf);
 
     fclose (ouf);
   } else if (out != NULL) {  /* if point-file was NOT given, try to read splines from a file */
@@ -153,8 +165,14 @@ main (int argc, char **argv)
     }
 
     for (i = 0; i < n; i++)
-      fprintf (gpf, "%g %g\n", fromX + i * dx,
-               value_spl (&spl, fromX + i * dx));
+	if (mode == 0) {
+   	   fprintf (	gpf, "%g %g\n", fromX + i * dx,
+	  	     	value_spl (&spl, fromX + i * dx));
+	}
+	else if (mode == 1) {
+	   fprintf (	gpf, "%g %g\n", fromX + i * dx,
+			value_spl_tan (&spl, fromX + i * dx));
+	}
 
     fclose (gpf);
   }

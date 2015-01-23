@@ -1,0 +1,3 @@
+rm -r splines_n.o
+rm -r apr_tryg.o
+rm -r main.o

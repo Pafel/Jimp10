@@ -49,14 +49,17 @@ value_spl_tan (spline_t * spl, double x)
   int n = spl->n;
   double nd = (double)n;
   double y = spl->a[0]/2;
-  double p = 2*M_PI/n;
+  double k = spl->x[n-1] - spl->x[0];
+  double mk = spl->x[n-1] - spl->x[n-2];
+  double p = 2*M_PI/(k+mk);
+
   char *nbEnv= getenv( "APPROX_BASE_SIZE" );
 
 	if (n % 2 == 1) {
 		m = (n-1)/2;
 
-	if( nbEnv != NULL && atoi( nbEnv ) > 0 && atoi( nbEnv ) <= m)
-		m = atoi( nbEnv );
+		if( nbEnv != NULL && atoi( nbEnv ) > 0 && atoi( nbEnv ) <= m)
+			m = atoi( nbEnv );
 
 		for (i = 1; i <= m ; i++)
 			y += spl->a[i]*cos(p*i*x) + spl->b[i]*sin(p*i*x);
@@ -65,13 +68,13 @@ value_spl_tan (spline_t * spl, double x)
 	else {
 		m = n/2;
 
-	if( nbEnv != NULL && atoi( nbEnv ) > 0 && atoi( nbEnv ) <= m)
-		m = atoi( nbEnv );
+		if( nbEnv != NULL && atoi( nbEnv ) > 0 && atoi( nbEnv ) <= m)
+			m = atoi( nbEnv );
 
-		for (i = 1; i < m ; i++)
-			y += spl->a[i]*cos(p*i*x) + spl->b[i]*sin(p*i*x);
+			for (i = 1; i < m ; i++)
+				y += spl->a[i]*cos(p*i*x) + spl->b[i]*sin(p*i*x);
 
-		y += spl->a[m]/2*cos(p*m*x);
+			y += spl->a[m]/2*cos(p*m*x);
 	}
 
 	return y;

@@ -8,7 +8,6 @@ void make_tryg (points_t * pts, spline_t * spl)
 {
 	int i, j, m;
 	int n = pts->n;
-	double nd = (double)n;
 	double p = 2*M_PI/n;
 
 	if (n % 2 == 1)
@@ -27,8 +26,8 @@ void make_tryg (points_t * pts, spline_t * spl)
 					spl->a[i] += spl->y[j]*cos(p*i*j);
 					spl->b[i] += spl->y[j]*sin(p*i*j);
 				}
-			spl->a[i] *= 2.0/nd;
-			spl->b[i] *= 2.0/nd;
+			spl->a[i] *= 2.0/n;
+			spl->b[i] *= 2.0/n;
 		}
 	}
 }

@@ -1,6 +1,8 @@
 #ifndef SPLINES_H
 #define SPLINES_H
 
+#include "points.h"
+
 #include <stdio.h>
 #include <math.h>
 
